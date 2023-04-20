@@ -8,6 +8,7 @@ function init(){
 
                 for (var i = 0; i<response.data.allUsers.length; i++){
                     showExpense(response.data.allUsers[i]);
+                    showInTable(response.data.allUsers[i]);
                 }
             })
             .catch( err => {
@@ -31,6 +32,7 @@ function onPressingAddExpense(){
             .then( (response) => {
                 console. log (response);
                 showExpense(response.data.newUserDetail);
+                showInTable(response.data.newUserDetail);
             })
             .catch((err) => {
                 document.body.innerHTML = document.body.innerHTML + "<h4>Something went wrong <h4>";
@@ -55,7 +57,10 @@ function deleteUser(id){
     console.log(id);
     axios.delete(`http://localhost:1000/user/delete-expense/${id}`)
     .then((response) => {
-        removeFromScreen(response);
+        console.log(response);
+        
+        // removeFromScreen(response);
+        removeFromTable(response);
     })
     .catch(err => {
         console.log(err);
@@ -70,4 +75,71 @@ function removeFromScreen(userId){
     if(childNodeToBeDeleted){
         parentNode.removeChild(childNodeToBeDeleted)
     }
+
+    init();
+}
+
+function removeFromTable(userId){
+    const parentNode = document.getElementById('tablerows');
+    const childNodeToBeDeleted = document.getElementById(userId);
+
+    if(childNodeToBeDeleted){
+        parentNode.removeChild(childNodeToBeDeleted)
+    }
+
+}
+
+function showInTable(expenseObj){
+
+    var table = document.getElementById('tablerows');
+    var row = table.insertRow();
+
+    var exp=row.insertCell(0);
+    var descp=row.insertCell(1);
+    var cat=row.insertCell(2);
+    var edt=row.insertCell(3);
+
+    exp.innerHTML = expenseObj.expense;
+    descp.innerHTML = expenseObj.description;
+    cat.innerHTML = expenseObj.category;
+    edt.innerHTML = `<button id = "${expenseObj.id}" class="btn" onclick = "deleteUser(${expenseObj.id})">DELETE</button>`;
+}
+
+// document.getElementById("tablerows").children.forEach(tr => {
+//     console.log(tr);
+//     tr.addEventListener("click", (event)=>{
+//         event.preventDefault();
+//         if(event.target.classList.contains("btn")) {
+//             // event.target.parentNode.parentNode.remove();
+//             console.log(event.target.parentNode.parentNode);
+//         } else {
+//             console.log(event.target);
+//         }
+//     });
+// });
+
+function userSignUp(){
+    console.log("adding user");
+            // const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const obj ={
+                // name,
+                email,
+                password
+            };
+
+            console.log(obj);
+
+            axios.post ("http://localhost:1000/user/add-user", obj)
+            .then( (response) => {
+                console. log (response);
+                // showExpense(response.data.newUserDetail);
+                // showInTable(response.data.newUserDetail);
+            })
+            .catch((err) => {
+                document.body.innerHTML = document.body.innerHTML + "<h4>Something went wrong <h4>";
+                console.log(err);
+            })
 }

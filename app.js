@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const Expense = require('./models/expense');
+const User = require('./models/signup-user');
 
 const sequelize = require('./util/database');
 
@@ -46,6 +47,31 @@ app.delete('/user/delete-expense/:id', async (req, res, next) => {
     await Expense. destroy({where: {id: uId}});
     res.sendStatus (200);
 })
+
+app.post('/user/add-user' , async(req, res, next) => {
+    try{
+    // const name = req.body.name;
+    const email = req.body.email;
+    const password = req.body.password;
+
+    console.log( email , password);
+
+    console.log("post request");
+
+    const data = await User.create( {
+        // name: name,
+        email: email,
+        password: password
+    })
+    res.status(201).json({newUserDetail : data});
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({
+            error: err
+        })
+    };
+});
 
 sequelize.sync()
 .then( () => {
