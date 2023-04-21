@@ -1,6 +1,7 @@
 let expenseArray=[];
 let selectedIndex=null;
 
+
 function init(){
     axios.get('http://localhost:1000/user/get-expense')
             .then( (response) => {

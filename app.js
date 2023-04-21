@@ -59,13 +59,12 @@ app.post('/user/signup' , async(req, res, next) => {
     console.log( email , password);
 
     console.log("post request");
-
-    const data = await User.create( {
-        name: name,
-        email: email,
-        password: password
+    const saltrounds = 10;
+    bcrypt.hash(password, saltrounds, async(err, hash) => {
+        console.log(err);
+        await User.create({name, email, password: hash})
+        res.status(201).json({message: 'Successfully create new user'})
     })
-    res.status(201).json({newUserDetail : data});
     }
     catch(err){
         console.log(err);
