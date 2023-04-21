@@ -29,7 +29,7 @@ function onPressingAddExpense(){
                 category
             };
 
-            axios.post ("http://localhost:1000/user/add-expense", obj)
+            axios.post ("http://localhost:1000/user/addExpense", obj)
             .then( (response) => {
                 console. log (response);
                 showExpense(response.data.newUserDetail);
