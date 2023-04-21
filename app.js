@@ -75,15 +75,26 @@ app.post('/user/signup' , async(req, res, next) => {
     };
 });
 
-app. post('/user/login' , async (req, res, next) => {
-    const email = req.body.email;
-    const password = req.body.password;
 
-    const user = await User.findAll();
-    res.status (200) . json ({allUsers: user} )
-
-
-});
+app.post('/user/login', async(req, res, next) => {
+        const { email, password } = req. body;
+        console. log (password);
+        const user = await User. findAll({ where : { email }}). then (user => {
+        if (user.length > 0){
+            if (user[0].password === password){
+                res.status (200). json ({success: true, message: "User logged in[successfully"})
+            } else{
+                return res.status(400).json ({success: false, message: "Password is incorrect"})
+            }
+        } 
+        else{
+        return res. status (404) . json ({success: false, message: 'User Doesnot exitst'})
+        }
+        })
+        .catch(err => {
+            res.status(400).json({success: false, message: err})
+        })
+})
 
 sequelize.sync()
 .then( () => {
