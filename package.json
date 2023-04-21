@@ -5,6 +5,7 @@
     "start-server": "node app.js"
   },
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "mysql2": "^3.2.2",

@@ -6,6 +6,8 @@ const User = require('./models/signup-user');
 
 const sequelize = require('./util/database');
 
+const bcrypt = require('bcrypt');
+
 const app = express();
 
 app.use(cors());
@@ -48,9 +50,9 @@ app.delete('/user/delete-expense/:id', async (req, res, next) => {
     res.sendStatus (200);
 })
 
-app.post('/user/add-user' , async(req, res, next) => {
+app.post('/user/signup' , async(req, res, next) => {
     try{
-    // const name = req.body.name;
+    const name = req.body.name;
     const email = req.body.email;
     const password = req.body.password;
 
@@ -59,7 +61,7 @@ app.post('/user/add-user' , async(req, res, next) => {
     console.log("post request");
 
     const data = await User.create( {
-        // name: name,
+        name: name,
         email: email,
         password: password
     })
@@ -71,6 +73,42 @@ app.post('/user/add-user' , async(req, res, next) => {
             error: err
         })
     };
+});
+
+app. get ('/user/get-user' , async (reg, res, next) => {
+
+    console.log("inside get all user");
+
+    try{
+    const users =await User.findAll({where:{email:email}})
+
+    if(users.length>0)
+    {
+        bcrypt.compare(password,users[0].password,(err,result)=>{
+        if(err)
+        {
+            console.log("error occured");
+            return result.status(500).json({message:'something went wrong'})
+        }
+        if(result===true)
+        {
+            return res.status(201).json({message:'user logged in'})
+        }
+        else{
+           return res.status(401).json({message:'password incorrect'})
+             
+        }
+        })
+        
+    }
+    else{
+        return res.status(404).json({message:'user not found'})
+    }
+
+}
+catch(err){
+    return res.status(500).json({message:err})
+}
 });
 
 sequelize.sync()
