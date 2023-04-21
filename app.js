@@ -75,40 +75,14 @@ app.post('/user/signup' , async(req, res, next) => {
     };
 });
 
-app. get ('/user/get-user' , async (reg, res, next) => {
+app. post('/user/login' , async (req, res, next) => {
+    const email = req.body.email;
+    const password = req.body.password;
 
-    console.log("inside get all user");
+    const user = await User.findAll();
+    res.status (200) . json ({allUsers: user} )
 
-    try{
-    const users =await User.findAll({where:{email:email}})
 
-    if(users.length>0)
-    {
-        bcrypt.compare(password,users[0].password,(err,result)=>{
-        if(err)
-        {
-            console.log("error occured");
-            return result.status(500).json({message:'something went wrong'})
-        }
-        if(result===true)
-        {
-            return res.status(201).json({message:'user logged in'})
-        }
-        else{
-           return res.status(401).json({message:'password incorrect'})
-             
-        }
-        })
-        
-    }
-    else{
-        return res.status(404).json({message:'user not found'})
-    }
-
-}
-catch(err){
-    return res.status(500).json({message:err})
-}
 });
 
 sequelize.sync()

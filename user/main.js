@@ -151,21 +151,27 @@ function isstringvalidate(string)
 }
 
 function onLogin(){
+    const loginDetails = {
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+    }
 
-    console.log("inside login");
+    console.log(loginDetails);
 
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    axios.post('http://localhost:1000/user/login', loginDetails)
+    .then((response) => {
+        if(response.status === 200){
+            console.log(response);
+            alert(response.data.message)
+        }
+        else {
+            throw new Error (response. data.message)
+        }
+    })
+    .catch(err => {
+        console.log(JSON.stringify(err));
 
-    axios.get('http://localhost:1000/user/get-user')
-            .then( (response) => {
-                console.log(response);
-            })
-            .catch( err => {
-                console.log(err);
-            })
-
-            console.log("exited login");
+    })
 
 }
 
