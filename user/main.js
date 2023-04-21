@@ -120,7 +120,8 @@ function showInTable(expenseObj){
 // });
 
 function userSignUp(){
-    console.log("adding user");
+    try{
+        console.log("adding user");
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -133,16 +134,18 @@ function userSignUp(){
 
             console.log(obj);
 
-            axios.post ("http://localhost:1000/user/signup", obj)
-            .then( (response) => {
-                console. log (response);
-                // showExpense(response.data.newUserDetail);
-                // showInTable(response.data.newUserDetail);
-            })
-            .catch((err) => {
-                document.body.innerHTML = document.body.innerHTML + "<h4>Something went wrong <h4>";
-                console.log(err);
-            })
+            const response = axios.post ("http://localhost:1000/user/signup", obj)
+
+            if(response === 201){
+                window.location.href="./user/login.html";
+            }
+            else{
+                throw new Error('Failed to login');
+            }
+    }
+    catch(err){
+        document.body. innerHTML += `<div style="color;red; ">${err} <div>` ;
+    }
 }
 
 function isstringvalidate(string)
@@ -161,16 +164,15 @@ function onLogin(){
 
     axios.post('http://localhost:1000/user/login', loginDetails)
     .then((response) => {
-        if(response.status === 200){
             console.log(response);
-            alert(response.data.message)
-        }
-        else {
-            throw new Error (response. data.message)
-        }
+            alert(response.data.message);
+
+            window.location.href = '/user/index.html';
+            
     })
     .catch(err => {
         console.log(JSON.stringify(err));
+        document.body.innerHTML += `<div style="color: red;">${err.message} </div>`;
 
     })
 
