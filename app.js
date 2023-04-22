@@ -16,15 +16,15 @@ app.use(cors());
 
 app.use(bodyParser.json({ extended: false }));
 
-app.delete('/user/delete-expense/:id', async (req, res, next) => { 
-    const uId = req.params. id;
-    await Expense. destroy({where: {id: uId}});
-    res.sendStatus (200);
-})
-
 app.use('/user', userRoutes);
 
 app.use('/user', expenseRoutes);
+
+// app.delete('/user/delete-expense/:id', async (req, res, next) => { 
+//     const uId = req.params. id;
+//     await Expense. destroy({where: {id: uId}});
+//     res.sendStatus (200);
+// })
 
 sequelize.sync()
 .then( () => {
