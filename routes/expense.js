@@ -8,4 +8,8 @@ const router = express.Router();
 
 router.post('/addExpense', expenseController.addExpense);
 
+router.get('/getExpense', expenseController.getExpense);
+
+router.get('/delete-expense', expenseController.deleteExpense);
+
 module.exports = router;

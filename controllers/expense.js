@@ -24,3 +24,14 @@ exports.addExpense = async(req, res, next) => {
             })
         };
 }
+
+exports.getExpense = async (reg, res, next) => {
+    const expense = await Expense .findAll();
+    res.status (200) . json ({allUsers: expense} )
+}
+
+exports.deleteExpense = async (req, res, next) => { 
+    const uId = req.params. id;
+    await Expense. destroy({where: {id: uId}});
+    res.sendStatus (200);
+}

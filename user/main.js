@@ -3,13 +3,13 @@ let selectedIndex=null;
 
 
 function init(){
-    axios.get('http://localhost:1000/user/get-expense')
+    axios.get('http://localhost:1000/user/getExpense')
             .then( (response) => {
                 console.log(response);
 
                 for (var i = 0; i<response.data.allUsers.length; i++){
                     showExpense(response.data.allUsers[i]);
-                    showInTable(response.data.allUsers[i]);
+                    // showInTable(response.data.allUsers[i]);
                 }
             })
             .catch( err => {
@@ -33,7 +33,7 @@ function onPressingAddExpense(){
             .then( (response) => {
                 console. log (response);
                 showExpense(response.data.newUserDetail);
-                showInTable(response.data.newUserDetail);
+                // showInTable(response.data.newUserDetail);
             })
             .catch((err) => {
                 document.body.innerHTML = document.body.innerHTML + "<h4>Something went wrong <h4>";
@@ -49,19 +49,35 @@ function showExpense(ex){
     
 
     const parentNode = document.getElementById('expenseList');
-    const childHTML = `<li id = ${ex.id}> ${ex.expense} -> ${ex.description} + ${ex.category} <button onclick=deleteUser('${ex.id}')>DELETE</button> </li>`;
+    // const childHTML = `<li id = ${ex.id}> ${ex.expense} -> ${ex.description} + ${ex.category} <button onclick=deleteUser('${ex.id}')>DELETE</button> </li>`;
 
-    parentNode.innerHTML = parentNode.innerHTML + childHTML;
+    const childNode = document.createElement('li');
+    childNode.id = `${ex.id}`;
+    childNode.textContent = `${ex.expense} ${ex.description} ${ex.category} `;
+
+
+    const btn = document.createElement('button');
+    btn.textContent = "DELETE";
+    btn.onclick = deleteUser;
+
+    childNode.appendChild(btn);
+
+    // parentNode.innerHTML = parentNode.innerHTML + childHTML;
+
+    parentNode.appendChild(childNode);
 }
 
-function deleteUser(id){
+function deleteUser(){
+    const id = this.parentNode.id;
     console.log(id);
     axios.delete(`http://localhost:1000/user/delete-expense/${id}`)
     .then((response) => {
         console.log(response);
         
         // removeFromScreen(response);
-        removeFromTable(response);
+        // removeFromTable(response);
+
+        this.parentNode.remove();
     })
     .catch(err => {
         console.log(err);
@@ -69,42 +85,31 @@ function deleteUser(id){
 
 }
 
-function removeFromScreen(userId){
-    const parentNode = document.getElementById('expenseList');
-    const childNodeToBeDeleted = document.getElementById(userId);
+// function removeFromTable(userId){
+//     const parentNode = document.getElementById('tablerows');
+//     const childNodeToBeDeleted = document.getElementById(userId);
 
-    if(childNodeToBeDeleted){
-        parentNode.removeChild(childNodeToBeDeleted)
-    }
+//     if(childNodeToBeDeleted){
+//         parentNode.removeChild(childNodeToBeDeleted)
+//     }
 
-    init();
-}
+// }
 
-function removeFromTable(userId){
-    const parentNode = document.getElementById('tablerows');
-    const childNodeToBeDeleted = document.getElementById(userId);
+// function showInTable(expenseObj){
 
-    if(childNodeToBeDeleted){
-        parentNode.removeChild(childNodeToBeDeleted)
-    }
+//     var table = document.getElementById('tablerows');
+//     var row = table.insertRow();
 
-}
+//     var exp=row.insertCell(0);
+//     var descp=row.insertCell(1);
+//     var cat=row.insertCell(2);
+//     var edt=row.insertCell(3);
 
-function showInTable(expenseObj){
-
-    var table = document.getElementById('tablerows');
-    var row = table.insertRow();
-
-    var exp=row.insertCell(0);
-    var descp=row.insertCell(1);
-    var cat=row.insertCell(2);
-    var edt=row.insertCell(3);
-
-    exp.innerHTML = expenseObj.expense;
-    descp.innerHTML = expenseObj.description;
-    cat.innerHTML = expenseObj.category;
-    edt.innerHTML = `<button id = "${expenseObj.id}" class="btn" onclick = "deleteUser(${expenseObj.id})">DELETE</button>`;
-}
+//     exp.innerHTML = expenseObj.expense;
+//     descp.innerHTML = expenseObj.description;
+//     cat.innerHTML = expenseObj.category;
+//     edt.innerHTML = `<button id = "${expenseObj.id}" class="btn" onclick = "deleteUser(${expenseObj.id})">DELETE</button>`;
+// }
 
 // document.getElementById("tablerows").children.forEach(tr => {
 //     console.log(tr);

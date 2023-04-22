@@ -16,11 +16,6 @@ app.use(cors());
 
 app.use(bodyParser.json({ extended: false }));
 
-app. get ('/user/get-expense' , async (reg, res, next) => {
-    const expense = await Expense .findAll();
-    res.status (200) . json ({allUsers: expense} )
-});
-
 app.delete('/user/delete-expense/:id', async (req, res, next) => { 
     const uId = req.params. id;
     await Expense. destroy({where: {id: uId}});
