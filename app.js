@@ -26,6 +26,9 @@ app.use('/user', expenseRoutes);
 //     res.sendStatus (200);
 // })
 
+Expense.belongsTo(User);
+User.hasMany(Expense);
+
 sequelize.sync()
 .then( () => {
     app.listen(1000);

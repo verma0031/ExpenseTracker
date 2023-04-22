@@ -3,12 +3,13 @@ let selectedIndex=null;
 
 
 function init(){
-    axios.get('http://localhost:1000/user/getExpense')
+    const token = localStorage.getItem('token');
+    axios.get('http://localhost:1000/user/getExpense', {headers: {"Authorization": token}})
             .then( (response) => {
                 console.log(response);
 
-                for (var i = 0; i<response.data.allUsers.length; i++){
-                    showExpense(response.data.allUsers[i]);
+                for (var i = 0; i<response.data.expenses.length; i++){
+                    showExpense(response.data.expenses[i]);
                     // showInTable(response.data.allUsers[i]);
                 }
             })
@@ -153,11 +154,6 @@ function userSignUp(){
     }
 }
 
-function isstringvalidate(string)
-{
-    if(string==undefined || string.length===0)return true;
-    return false;
-}
 
 function onLogin(){
     const loginDetails = {
@@ -171,6 +167,8 @@ function onLogin(){
     .then((response) => {
             console.log(response);
             alert(response.data.message);
+
+            localStorage.setItem('token', response.data.token);
 
             window.location.href = '/user/index.html';
             

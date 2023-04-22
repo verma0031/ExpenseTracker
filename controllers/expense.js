@@ -25,9 +25,15 @@ exports.addExpense = async(req, res, next) => {
         };
 }
 
-exports.getExpense = async (reg, res, next) => {
-    const expense = await Expense.findAll();
-    res.status (200) . json ({allUsers: expense} )
+exports.getExpense = async (req, res, next) => {
+
+    Expense.findAll({ where : { UserId: req.user.id}}).then(expenses => {
+        return res.status(200).json({expenses, success: true})
+    })
+    .catch(err => {
+        console.log(err)
+        return res.status(500).json({ error: err, success: false})
+    })
 }
 
 exports.deleteExpense = async (req, res, next) => { 
