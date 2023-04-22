@@ -13,7 +13,8 @@ exports.addExpense = async(req, res, next) => {
         const data = await Expense.create( {
             expense: expense,
             description: description,
-            category: category
+            category: category,
+            UserId:req.user.id
         })
         res.status(201).json({newUserDetail : data});
         }
@@ -38,6 +39,6 @@ exports.getExpense = async (req, res, next) => {
 
 exports.deleteExpense = async (req, res, next) => { 
     const uId = req.params. id;
-    await Expense. destroy({where: {id: uId}});
+    await Expense. destroy({where: {id: uId, UserId: req.user.id}});
     res.sendStatus (200);
 }

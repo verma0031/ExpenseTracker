@@ -9,6 +9,8 @@ exports.authenticate = (req, res, next) => {
         console.log('userID >>>> ', user.userId)
         User.findByPk(user.userId).then(user => {
 
+            console.log("autherization user",user);
+
             req.user = user; ///ver
             next();
         })

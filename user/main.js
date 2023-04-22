@@ -20,17 +20,18 @@ function init(){
 
 function onPressingAddExpense(){
     console.log("adding expense");
-            const expense = document.getElementById('expense').value;
-            const description = document.getElementById('description').value;
-            const category = document.getElementById('category').value;
+    const token = localStorage.getItem('token');
+    const expense = document.getElementById('expense').value;
+    const description = document.getElementById('description').value;
+    const category = document.getElementById('category').value;
 
-            const obj ={
-                expense,
-                description,
-                category
-            };
+    const obj ={
+        expense,
+        description,
+        category
+    };
 
-            axios.post ("http://localhost:1000/user/addExpense", obj)
+            axios.post ("http://localhost:1000/user/addExpense", obj, {headers: {"Authorization": token}})
             .then( (response) => {
                 console. log (response);
                 showExpense(response.data.newUserDetail);
@@ -70,8 +71,9 @@ function showExpense(ex){
 
 function deleteUser(){
     const id = this.parentNode.id;
+    const token = localStorage.getItem('token');
     console.log(id);
-    axios.delete(`http://localhost:1000/user/delete-expense/${id}`)
+    axios.delete(`http://localhost:1000/user/delete-expense/${id}`, {headers: {"Authorization": token}})
     .then((response) => {
         console.log(response);
         
