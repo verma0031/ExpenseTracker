@@ -4,7 +4,15 @@ const bodyParser = require('body-parser');
 const Expense = require('./models/expense');
 const User = require('./models/user');
 const userRoutes = require('./routes/user');
-const expenseRoutes = require('./routes/expense')
+const expenseRoutes = require('./routes/expense');
+const purchaseRoutes = require('./routes/purchase');
+const Order = require('./models/order');
+
+
+const dotenv = require('dotenv');
+
+dotenv.config();
+
 
 const sequelize = require('./util/database');
 
@@ -20,6 +28,8 @@ app.use('/user', userRoutes);
 
 app.use('/user', expenseRoutes);
 
+app.use('/purchase', purchaseRoutes);
+
 // app.delete('/user/delete-expense/:id', async (req, res, next) => { 
 //     const uId = req.params. id;
 //     await Expense. destroy({where: {id: uId}});
@@ -28,6 +38,9 @@ app.use('/user', expenseRoutes);
 
 Expense.belongsTo(User);
 User.hasMany(Expense);
+
+User.hasMany(Order);
+Order.belongsTo(User);
 
 sequelize.sync()
 .then( () => {
