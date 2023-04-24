@@ -1,5 +1,5 @@
 const Razorpay = require('razorpay');
-const { JSON } = require('sequelize');
+const {JSON} = require('sequelize');
 const Order = require('../models/order');
 const userController = require('./user');
 
@@ -12,7 +12,7 @@ exports.purchasepremium =async (req, res) => {
         })
         const amount = 2500;
 
-        // console.log("Razorpay",rzp);
+        console.log("Razorpay",rzp);
         console.log("\n\n\nHere");
         rzp.orders.create({amount, currency: "INR"}, (err, order) => {
             console.log("Order in creation is", order);
@@ -49,7 +49,7 @@ exports.updateTransactionStatus = async (req, res ) => {
         const promise2 =  req.user.update({ ispremiumuser: true }) 
 
         Promise.all([promise1, promise2]).then(()=> {
-            return res.status(202).json({sucess: true, message: "Transaction Successful", token: userController.generateToken(userId) });
+            return res.status(202).json({sucess: true, message: "Transaction Successful", token: userController.generateToken(userId, true) });
         }).catch((error ) => {
             throw new Error(error)
         })
