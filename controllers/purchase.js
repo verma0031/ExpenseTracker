@@ -1,4 +1,5 @@
 const Razorpay = require('razorpay');
+const { JSON } = require('sequelize');
 const Order = require('../models/order');
 const userController = require('./user');
 
@@ -11,18 +12,20 @@ exports.purchasepremium =async (req, res) => {
         })
         const amount = 2500;
 
-        console.log("Razorpay",rzp);
-
+        // console.log("Razorpay",rzp);
+        console.log("\n\n\nHere");
         rzp.orders.create({amount, currency: "INR"}, (err, order) => {
             console.log("Order in creation is", order);
             if(err) {
+                console.log(err);
                 throw new Error("Error in creation",JSON.stringify(err));
             }
             req.user.createOrder({ orderid: order.id, status: 'PENDING'}).then(() => {
+                console.log("After creating order", order);
                 return res.status(201).json({ order, key_id : rzp.key_id});
 
             }).catch(err => {
-                throw new Error(err)
+                throw new Error(err);
             })
         })
     } catch(err){
@@ -35,13 +38,18 @@ exports.purchasepremium =async (req, res) => {
 exports.updateTransactionStatus = async (req, res ) => {
     try {
         const userId = req.user.id;
+        console.log("Update transaction status\n",userId);
         const { payment_id, order_id} = req.body;
+        console.log("Update transaction status\n",req.body);
         const order  = await Order.findOne({where : {orderid : order_id}}) //2
-        const promise1 =  order.update({ paymentid: payment_id, status: 'SUCCESSFUL'}) 
+
+        console.log("\n tarnsaction status\n", order);
+
+        const promise1 =  order.update({ paymentid: payment_id, status: 'SUCCESSFUL'})
         const promise2 =  req.user.update({ ispremiumuser: true }) 
 
         Promise.all([promise1, promise2]).then(()=> {
-            return res.status(202).json({sucess: true, message: "Transaction Successful", token: userController.generateAccessToken(userId,undefined , true) });
+            return res.status(202).json({sucess: true, message: "Transaction Successful", token: userController.generateToken(userId) });
         }).catch((error ) => {
             throw new Error(error)
         })

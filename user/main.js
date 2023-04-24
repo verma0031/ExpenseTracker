@@ -187,7 +187,7 @@ document.getElementById('rzp-button1').onclick = async function (e) {
     console.log("rpz button clicked");
     const token = localStorage.getItem('token')
     const response  = await axios.get("http://localhost:1000/purchase/premiummembership", { headers: {"Authorization" : token} });
-    console.log(response);
+    console.log("response after axios",response);
     var options =
     {
      "key": response.data.key_id, // Enter the Key ID generated from the Dashboard
@@ -199,10 +199,10 @@ document.getElementById('rzp-button1').onclick = async function (e) {
              payment_id: response.razorpay_payment_id,
          }, { headers: {"Authorization" : token} })
         
-        console.log(res)
+        console.log(res);
          alert('You are a Premium User Now')
          document.getElementById('rzp-button1').style.visibility = "hidden"
-         document.getElementById('message').innerHTML = "You are a premium user "
+        //  document.getElementById('message').innerHTML = "You are a premium user "
          localStorage.setItem('token', res.data.token)
         //  showLeaderboard()
      },

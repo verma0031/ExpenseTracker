@@ -11,8 +11,8 @@ function isstringinvalid(string){
     }
 }
 
-const generateToken = (id,name) => {
-    return jwt.sign({userId: id, name: name}, 'dsghJWarYXGjhgrDaICnGZHjGw9yDcre');
+const generateToken = (id) => {
+    return jwt.sign({userId: id}, 'dsghJWarYXGjhgrDaICnGZHjGw9yDcre');
 }
 
 exports.signup = async (req, res, next)=>{
@@ -48,7 +48,7 @@ exports.login = async (req, res, next) => {
                     res.status(500).json({success: false, message: "Something went wrong"});
                 }
                 if(result == true){
-                    res.status(200).json({success: true, message: "User logged in successfully", token: generateToken(user[0].id, user[0].name)});
+                    res.status(200).json({success: true, message: "User logged in successfully", token: generateToken(user[0].id)});
                 }
                 else{
                     return res.status(400).json({success: false, message: 'Password is incorrect'})
@@ -61,3 +61,5 @@ exports.login = async (req, res, next) => {
         res.status(500).json({message: err, success: false})
     }
 }
+
+exports.generateToken = generateToken;
