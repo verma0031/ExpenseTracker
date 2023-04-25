@@ -70,28 +70,28 @@ function userSignUp(){
 }
 
 
-function onLogin(){
+function login(e) {
+    e.preventDefault();
+    console.log(e.target.name);
+
     const loginDetails = {
-        email: document.getElementById('email').value,
-        password: document.getElementById('password').value
+        email: e.target.email.value,
+        password: e.target.password.value
+
     }
+    console.log(loginDetails)
+    axios.post('http://localhost:1000/user/login',loginDetails).then(response => {
+            alert(response.data.message)
+            console.log(response)
 
-    console.log(loginDetails);
+            if(!localStorage.getItem(loginDetails.email))
+            localStorage.setItem(loginDetails.email,response.data.token)
 
-    axios.post('http://localhost:1000/user/login', loginDetails)
-    .then((response) => {
-            console.log(response);
-            alert(response.data.message);
+            localStorage.setItem('curr',loginDetails.email)
 
-            localStorage.setItem('token', response.data.token);
-
-            window.location.href = '/user/index.html';
-            
+            window.location.href = "/user/index.html"
+    }).catch(err => {
+        console.log(JSON.stringify(err))
+        document.body.innerHTML += `<div style="color:red;">${err.message} <div>`;
     })
-    .catch(err => {
-        console.log(JSON.stringify(err));
-        document.body.innerHTML += `<div style="color: red;">${err.message} </div>`;
-
-    })
-
 }

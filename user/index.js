@@ -1,9 +1,40 @@
-let expenseArray=[];
-let selectedIndex=null;
 
 function showPremiumUser(){
     document.getElementById('rzp-button1').style.visibility = "hidden"
     document.getElementById('message').innerHTML = "You are a premium user "
+    
+    // const parentNode = document.getElementById('message');
+    // const btn = document.createElement('button');
+    // btn.textContent = "Show LeaderBoard";
+    // btn.id = "leaderButton";
+    // btn.onclick = showLeaderBoard;
+
+    // parentNode.appendChild(btn);
+
+    
+
+
+
+}
+
+function showLeaderBoard(){
+
+    const inputElement = document.createElement("input")
+    inputElement.type = "button"
+    inputElement.value = 'Show Leaderboard'
+    inputElement.onclick = async() => {
+        const token = localStorage.getItem(localStorage.getItem('curr'));
+        const userLeaderBoardArray = await axios.get('http://localhost:1000/premium/showLeaderBoard', { headers: {"Authorization" : token} })
+        console.log(userLeaderBoardArray)
+
+        var leaderboardElem = document.getElementById('leaderboard')
+        leaderboardElem.innerHTML += '<h1> Leader Board </<h1>'
+        userLeaderBoardArray.data.forEach((userDetails) => {
+            leaderboardElem.innerHTML += `<li>Name - ${userDetails.name} Total Expense - ${userDetails.total_cost || 0} </li>`
+        })
+    }
+    document.getElementById("message").appendChild(inputElement);
+
 }
 
 function parseJwt (token) {
@@ -16,11 +47,13 @@ function parseJwt (token) {
     return JSON.parse(jsonPayload);
 }
 
-
-function init(){
-    const token = localStorage.getItem('token');
+window.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem(localStorage.getItem('curr'));
+    console.log("\ndom content\n",token);
     const decodeToken = parseJwt(token);
+    console.log("DECODED TOKEN",decodeToken);
     const ispremiumuser = decodeToken.ispremiumuser;
+    console.log("\nis premium user\n",ispremiumuser);
 
     if(ispremiumuser){
         showPremiumUser()
@@ -38,11 +71,12 @@ function init(){
             .catch( err => {
                 console.log(err);
             })
-}
+})
+
 
 function onPressingAddExpense(){
     console.log("adding expense");
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem(localStorage.getItem('curr'));
     const expense = document.getElementById('expense').value;
     const description = document.getElementById('description').value;
     const category = document.getElementById('category').value;
@@ -93,7 +127,7 @@ function showExpense(ex){
 
 function deleteUser(){
     const id = this.parentNode.id;
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem(localStorage.getItem('curr'));
     console.log(id);
     axios.delete(`http://localhost:1000/user/delete-expense/${id}`, {headers: {"Authorization": token}})
     .then((response) => {
@@ -113,7 +147,8 @@ function deleteUser(){
 
 document.getElementById('rzp-button1').onclick = async function (e) {
     console.log("rpz button clicked");
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem(localStorage.getItem('curr'));
+    console.log("token in rzp", token);
     const response  = await axios.get("http://localhost:1000/purchase/premiummembership", { headers: {"Authorization" : token} });
     console.log("response after axios",response);
     var options =
@@ -131,8 +166,8 @@ document.getElementById('rzp-button1').onclick = async function (e) {
          alert('You are a Premium User Now')
          document.getElementById('rzp-button1').style.visibility = "hidden"
          document.getElementById('message').innerHTML = "You are a premium user "
-         localStorage.setItem('token', res.data.token)
-        //  showLeaderboard()
+         localStorage.setItem(localStorage.getItem('curr'), res.data.token)
+         showLeaderBoard()
      },
   };
   const rzp1 = new Razorpay(options);

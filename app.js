@@ -6,7 +6,9 @@ const User = require('./models/user');
 const userRoutes = require('./routes/user');
 const expenseRoutes = require('./routes/expense');
 const purchaseRoutes = require('./routes/purchase');
+const premiumFeatureRoutes = require('./routes/premiumFeature')
 const Order = require('./models/order');
+const Razorpay = require('razorpay');
 
 
 const dotenv = require('dotenv');
@@ -29,6 +31,8 @@ app.use('/user', userRoutes);
 app.use('/user', expenseRoutes);
 
 app.use('/purchase', purchaseRoutes);
+
+app.use('/premium', premiumFeatureRoutes);
 
 // app.delete('/user/delete-expense/:id', async (req, res, next) => { 
 //     const uId = req.params. id;

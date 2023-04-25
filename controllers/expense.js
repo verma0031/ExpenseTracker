@@ -28,6 +28,8 @@ exports.addExpense = async(req, res, next) => {
 
 exports.getExpense = async (req, res, next) => {
 
+    console.log("getting expense",req.user.id);
+
     Expense.findAll({ where : { UserId: req.user.id}}).then(expenses => {
         return res.status(200).json({expenses, success: true})
     })

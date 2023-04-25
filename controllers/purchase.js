@@ -37,19 +37,23 @@ exports.purchasepremium =async (req, res) => {
 
 exports.updateTransactionStatus = async (req, res ) => {
     try {
+        console.log("\ntransaction status\n", req.user);
+        const name = req.user.name;
         const userId = req.user.id;
         console.log("Update transaction status\n",userId);
+
+
         const { payment_id, order_id} = req.body;
         console.log("Update transaction status\n",req.body);
-        const order  = await Order.findOne({where : {orderid : order_id}}) //2
 
+        const order  = await Order.findOne({where : {orderid : order_id}}) //2
         console.log("\n tarnsaction status\n", order);
 
-        const promise1 =  order.update({ paymentid: payment_id, status: 'SUCCESSFUL'})
+        const promise1 =  order.update({ paymentid: payment_id, status: 'SUCCESSFUL'}) 
         const promise2 =  req.user.update({ ispremiumuser: true }) 
 
         Promise.all([promise1, promise2]).then(()=> {
-            return res.status(202).json({sucess: true, message: "Transaction Successful", token: userController.generateToken(userId, true) });
+            return res.status(202).json({sucess: true, message: "Transaction Successful", token: userController.generateAccessToken(userId, name , true) });
         }).catch((error ) => {
             throw new Error(error)
         })
