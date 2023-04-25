@@ -21,7 +21,11 @@ const User = sequelize.define('Users',{
   password: {
     type: Sequelize.STRING,
     allowNull: false
-  }
+  },
+  totalexpenses:{
+    type:Sequelize.INTEGER,
+    defaultValue:0
+}
 });
 
 module.exports = User;
