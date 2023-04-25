@@ -3,8 +3,8 @@ const sequelize = require('../util/database')
 const User = require('../models/user');
 
 exports.addExpense = async(req, res, next) => {
+    const t = await sequelize.transaction();
     try{
-        const t = await sequelize.transaction();
         const expense = req.body.expense;
         const description = req.body.description;
         const category = req.body.category;
@@ -58,7 +58,22 @@ exports.getExpense = async (req, res, next) => {
 }
 
 exports.deleteExpense = async (req, res, next) => { 
+
+    const t = await sequelize.transaction();
     const uId = req.params. id;
-    await Expense. destroy({where: {id: uId, UserId: req.user.id}});
-    res.sendStatus (200);
+    const expenseRow = await Expense.findOne({where: {id: uId, UserId: req.user.id}, transaction: t})
+    const expense = expenseRow.expense;
+    const totalExpense = Number(req.user.totalexpenses)- Number(expense);
+
+   Expense. destroy({where: {id: uId, UserId: req.user.id}, transaction: t})
+
+
+        User.update({
+            totalexpenses: totalExpense
+        },{where: {id: req.user.id}, transaction: t})
+        .then(async () => {
+            t.commit();
+            return res.status(200).json({ success: true, message: "Deleted Successfuly"});
+        })
+
 }
