@@ -3,6 +3,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const Expense = require('./models/expense');
 const User = require('./models/user');
+const Forgotpassword = require('./models/forgotpassword');
+
 const userRoutes = require('./routes/user');
 const expenseRoutes = require('./routes/expense');
 const purchaseRoutes = require('./routes/purchase');
@@ -48,6 +50,9 @@ User.hasMany(Expense);
 
 User.hasMany(Order);
 Order.belongsTo(User);
+
+User.hasMany(Forgotpassword);
+Forgotpassword.belongsTo(User);
 
 sequelize.sync()
 .then( () => {

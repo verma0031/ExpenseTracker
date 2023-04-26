@@ -12,12 +12,13 @@ exports.forgotpassword = async (req, res) => {
         console.log("\ninside forgot pass\n", user);
         if(user){
             const id = uuid.v4();
+            console.log(id);
             user.createForgotpassword({ id , active: true })
                 .catch(err => {
                     throw new Error(err)
                 })
 
-            sgMail.setApiKey(process.env.SENGRID_API_KEY)
+            sgMail.setApiKey('xsmtpsib-b8f220a0178cd5ed410e5aaf13c178d5a60e404d9ea81e8ef129f3c66fb68411-NZvQ6M5tHFgrVKjn')
 
             const msg = {
                 to: email, // Change to your recipient
@@ -53,6 +54,7 @@ exports.forgotpassword = async (req, res) => {
 
 exports.resetpassword = (req, res) => {
     const id =  req.params.id;
+    console.log(id);
     Forgotpassword.findOne({ where : { id }}).then(forgotpasswordrequest => {
         if(forgotpasswordrequest){
             forgotpasswordrequest.update({ active: false});
@@ -79,10 +81,13 @@ exports.resetpassword = (req, res) => {
 exports.updatepassword = (req, res) => {
 
     try {
-        const { newpassword } = req.query;
-        const { resetpasswordid } = req.params;
-        Forgotpassword.findOne({ where : { id: resetpasswordid }}).then(resetpasswordrequest => {
-            User.findOne({where: { id : resetpasswordrequest.userId}}).then(user => {
+        console.log("\nupdating password\n", req.params);
+        console.log("\nupdating password\n", req.query);
+        const {newpassword}  = req.query;
+        const {id}  = req.params;
+        Forgotpassword.findOne({ where : { id: id }}).then(resetpasswordrequest => {
+            console.log("\nupdate pass\n",resetpasswordrequest);
+            User.findOne({where: { id : resetpasswordrequest.UserId}}).then(user => {
                 // console.log('userDetails', user)
                 if(user) {
                     //encrypt the password
