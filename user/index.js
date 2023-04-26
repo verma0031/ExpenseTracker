@@ -11,6 +11,8 @@ function showPremiumUser(){
 
     // parentNode.appendChild(btn);
 
+    showLeaderBoard();
+
     
 
 
