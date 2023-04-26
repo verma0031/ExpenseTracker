@@ -84,10 +84,8 @@ function login(e) {
             alert(response.data.message)
             console.log(response)
 
-            if(!localStorage.getItem(loginDetails.email))
-            localStorage.setItem(loginDetails.email,response.data.token)
-
-            localStorage.setItem('curr',loginDetails.email)
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('userDetails', JSON.stringify(response.data.user))
 
             window.location.href = "/user/index.html"
     }).catch(err => {

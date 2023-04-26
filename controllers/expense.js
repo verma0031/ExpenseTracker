@@ -1,6 +1,11 @@
 const Expense = require('../models/expense');
 const sequelize = require('../util/database')
 const User = require('../models/user');
+const AWS=require('aws-sdk');
+const { response } = require('express');
+
+const { BlobServiceClient } = require('@azure/storage-blob');
+const { v1: uuidv1} = require('uuid');
 
 exports.addExpense = async(req, res, next) => {
     const t = await sequelize.transaction();
@@ -77,3 +82,52 @@ exports.deleteExpense = async (req, res, next) => {
         })
 
 }
+
+async function uploadToS3(data, filename) {
+    // try{
+        const BUCKET_NAME = 'expensetracker563';
+  
+    const s3bucket = new AWS.S3({
+      accessKeyId: 'AKIAYQF6SJQJWX6V665H',
+      secretAccessKey: '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',
+    });
+  
+      var params = {
+        Bucket: BUCKET_NAME,
+        Key: filename,
+        Body: data,
+        ACL:'public-read'
+      }
+      return new Promise((resolve,reject)=>[
+        s3bucket.upload(params, (err, s3response) => {
+            if (err) {
+              console.log('Something went wrong', err);
+              reject(err)
+            } else {
+              console.log('Uploaded successfully', s3response);
+              resolve(s3response.Location)
+            }
+          })
+      ])
+    // }
+    // catch(err){
+    //     throw new Error(err)
+    // }
+
+  }
+
+
+exports.downloadExpenses = async (req, res) => {
+    try {
+      const expenses = await Expense.findAll({ where: { UserId: req.user.id } });
+      const stringifiedExpenses = JSON.stringify(expenses);
+      const userid=req.user.id
+      const filename = `Expense.txt${userid}/${new Date()}`;
+      const fileurl =await uploadToS3(stringifiedExpenses, filename);
+      console.log(fileurl)
+      res.status(201).json({ fileurl, success: true });
+    } catch (error) {
+      console.log(error);
+         res.status(500).json({ err: error });
+    }
+  };
