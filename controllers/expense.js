@@ -3,6 +3,7 @@ const sequelize = require('../util/database')
 const User = require('../models/user');
 const AWS=require('aws-sdk');
 const { response } = require('express');
+require('dotenv').config()
 
 const { BlobServiceClient } = require('@azure/storage-blob');
 const { v1: uuidv1} = require('uuid');
@@ -83,51 +84,70 @@ exports.deleteExpense = async (req, res, next) => {
 
 }
 
-async function uploadToS3(data, filename) {
-    // try{
-        const BUCKET_NAME = 'expensetracker563';
-  
-    const s3bucket = new AWS.S3({
-      accessKeyId: 'AKIAYQF6SJQJWX6V665H',
-      secretAccessKey: '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',
-    });
-  
-      var params = {
-        Bucket: BUCKET_NAME,
-        Key: filename,
-        Body: data,
-        ACL:'public-read'
-      }
-      return new Promise((resolve,reject)=>[
-        s3bucket.upload(params, (err, s3response) => {
-            if (err) {
-              console.log('Something went wrong', err);
-              reject(err)
-            } else {
-              console.log('Uploaded successfully', s3response);
-              resolve(s3response.Location)
-            }
-          })
-      ])
-    // }
-    // catch(err){
-    //     throw new Error(err)
-    // }
+function uploadToS3(data, filename){
+    const BUCKET_NAME = process.env.BUCKET_NAME;
+    console.log(BUCKET_NAME);
+    const IAM_USER_ID = process.env.IAM_USER_ID;
+    console.log(IAM_USER_ID);
+    const IAM_USER_SECRET = process.env.IAM_USER_SECRET;
+    console.log(IAM_USER_SECRET);
 
-  }
+    let s3bucket = new AWS.S3({
+        accessKeyId: IAM_USER_ID,
+        secretAccessKey: IAM_USER_SECRET,
+        // Bucket: BUCKET_NAME 
+    })
+
+        var params = {
+            Bucket: BUCKET_NAME,
+            Key: filename,
+            Body: data,
+            ACL:'public-read'
+        }
 
 
-exports.downloadExpenses = async (req, res) => {
-    try {
-      const expenses = await Expense.findAll({ where: { UserId: req.user.id } });
-      const stringifiedExpenses = JSON.stringify(expenses);
-      const userid=req.user.id
-      const filename = `Expense.txt${userid}/${new Date()}`;
-      const fileurl =await uploadToS3(stringifiedExpenses, filename);
-      console.log(fileurl)
-      res.status(201).json({ fileurl, success: true });
-    } catch (error) {
-      console.log(error);
-         res.status(500).json({ err: error });
+        return new Promise((resolve,reject)=>[
+            s3bucket.upload(params, (err, s3response) => {
+                if (err) {
+                  console.log('Something went wrong', err);
+                  reject(err)
+                } else {
+                  console.log('Uploaded successfully', s3response);
+                  resolve(s3response.Location)
+                }
+              })
+          ])
+
+        // s3bucket.upload(params, (err, s3response) => {
+        //     if(err){
+        //         console.log('something went wrong in upload',err);
+        //     }
+        //     else{
+        //         console.log('successfully uploaded',s3response);
+        //         return s3response.location;
+        //     }
+        // })
+
+}
+
+exports.downloadexpense = async(req, res, next) => {
+
+    try{
+    console.log("\nin download expenses\n", req.user);
+    const expenses = await req.user.getExpenses();
+    console.log(expenses);
+
+    const stringifiedExpenses = JSON.stringify(expenses);
+
+    const userId = req.user.id;
+
+    const filename = `Expense${userId}/${new Date()}.txt`;
+    
+    const fileURL = await uploadToS3(stringifiedExpenses, filename);
+
+    res.status(200).json({fileURL, success: true})
+    }catch(err){
+        console.log(err);
+        res.status(500).json({fileURL:'', success: false, err: err})
     }
-  };
+}

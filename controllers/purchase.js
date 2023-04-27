@@ -40,8 +40,15 @@ exports.updateTransactionStatus = async (req, res ) => {
         const { payment_id, order_id} = req.body;
         Order.findOne({where : {orderid : order_id}}).then(order => {
             order.update({ paymentid: payment_id, status: 'SUCCESSFUL'}).then(() => {
+                console.log("\nupdate transaction\n", req.user.id);
+                console.log("\nupdate transaction\n", req.user.ispremiumuser);
+
                 req.user.update({ispremiumuser: true})
-                return res.status(202).json({sucess: true, message: "Transaction Successful"});
+
+                console.log("\nafter update transaction\n", req.user.ispremiumuser);
+
+
+                return res.status(202).json({sucess: true, message: "Transaction Successful", token:userController.generateAccessToken(req.user.id,undefined,req.user.ispremiumuser)});
             }).catch((err)=> {
                 throw new Error(err);
             })

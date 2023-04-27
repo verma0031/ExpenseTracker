@@ -142,11 +142,11 @@ function deleteUser(){
 function download(){
     axios.get('http://localhost:1000/user/download', { headers: {"Authorization" : token} })
     .then((response) => {
-        if(response.status === 201){
+        if(response.status === 200){
             //the bcakend is essentially sending a download link
             //  which if we open in browser, the file would download
             var a = document.createElement("a");
-            a.href = response.data.fileUrl;
+            a.href = response.data.fileURL;
             a.download = 'myexpense.csv';
             a.click();
         } else {
@@ -155,7 +155,7 @@ function download(){
 
     })
     .catch((err) => {
-        console.log(err);
+        console.log("after download error",err);
     });
 }
 
@@ -180,7 +180,8 @@ document.getElementById('rzp-button1').onclick = async function (e) {
          alert('You are a Premium User Now')
          document.getElementById('rzp-button1').style.visibility = "hidden"
          document.getElementById('message').innerHTML = "You are a premium user "
-         showLeaderBoard()
+         localStorage.setItem('token', res.data.token)
+         showPremiumUser()
      },
   };
   const rzp1 = new Razorpay(options);
