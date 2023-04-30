@@ -81,8 +81,7 @@ function login(e) {
     }
     console.log(loginDetails)
     axios.post('http://localhost:1000/user/login',loginDetails).then(response => {
-            alert(response.data.message)
-            console.log(response)
+        alert(response.data.message)
 
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('userDetails', JSON.stringify(response.data.user))

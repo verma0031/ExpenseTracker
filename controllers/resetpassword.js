@@ -1,6 +1,8 @@
 const uuid = require('uuid');
 const sgMail = require('@sendgrid/mail');
 const bcrypt = require('bcrypt');
+require('dotenv').config()
+
 
 const User = require('../models/user');
 const Forgotpassword = require('../models/forgotpassword');
@@ -18,11 +20,11 @@ exports.forgotpassword = async (req, res) => {
                     throw new Error(err)
                 })
 
-            sgMail.setApiKey('xsmtpsib-b8f220a0178cd5ed410e5aaf13c178d5a60e404d9ea81e8ef129f3c66fb68411-NZvQ6M5tHFgrVKjn')
+            sgMail.setApiKey('process.env.SENDGRID_API_KEY')
 
             const msg = {
                 to: email, // Change to your recipient
-                from: 'peeyushverma888@gmail.com', // Change to your verified sender
+                from: process.env.SG_MAIL, // Change to your verified sender
                 subject: 'Sending with SendGrid is Fun',
                 text: 'and easy to do anywhere, even with Node.js',
                 html: `<a href="http://localhost:1000/password/resetpassword/${id}">Reset password</a>`,
@@ -32,12 +34,13 @@ exports.forgotpassword = async (req, res) => {
             .send(msg)
             .then((response) => {
 
-                // console.log(response[0].statusCode)
-                // console.log(response[0].headers)
+                console.log(response[0].statusCode)
+                console.log(response[0].headers)
                 return res.status(response[0].statusCode).json({message: 'Link to reset password sent to your mail ', sucess: true})
 
             })
             .catch((error) => {
+                console.log(err);
                 throw new Error(error);
             })
 
@@ -81,30 +84,36 @@ exports.resetpassword = (req, res) => {
 exports.updatepassword = (req, res) => {
 
     try {
-        console.log("\nupdating password\n", req.params);
-        console.log("\nupdating password\n", req.query);
-        const {newpassword}  = req.query;
-        const {id}  = req.params;
+        // console.log("\nupdating password\n", req.params);
+        // console.log("\nupdating password\n", req.query);
+        const newpassword  = req.query.newpassword;
+        const id  = req.params.resetpasswordid;
+        // console.log("\nupdating password\n", id);
         Forgotpassword.findOne({ where : { id: id }}).then(resetpasswordrequest => {
-            console.log("\nupdate pass\n",resetpasswordrequest);
+            // console.log("\nupdate pass\n",resetpasswordrequest);
+            // console.log("\nupdate pass\n",resetpasswordrequest.UserId);
+
             User.findOne({where: { id : resetpasswordrequest.UserId}}).then(user => {
                 // console.log('userDetails', user)
                 if(user) {
                     //encrypt the password
+                    console.log("user found and dettails are",user);
 
                     const saltRounds = 10;
                     bcrypt.genSalt(saltRounds, function(err, salt) {
                         if(err){
-                            console.log(err);
+
+                            console.log("Err in generating salt",err);
                             throw new Error(err);
                         }
                         bcrypt.hash(newpassword, salt, function(err, hash) {
                             // Store hash in your password DB.
                             if(err){
-                                console.log(err);
+                                console.log("Error in hasing",err);
                                 throw new Error(err);
                             }
-                            user.update({ password: hash }).then(() => {
+                            User.update({ password: hash }).then(() => {
+                                console.log("updated successfully");
                                 res.status(201).json({message: 'Successfuly update the new password'})
                             })
                         });
@@ -115,6 +124,7 @@ exports.updatepassword = (req, res) => {
             })
         })
     } catch(error){
+        console.log("\nin catch block\n",error);
         return res.status(403).json({ error, success: false } )
     }
 

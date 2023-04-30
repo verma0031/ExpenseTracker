@@ -1,4 +1,6 @@
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const Expense = require('./models/expense');
@@ -15,6 +17,8 @@ const Razorpay = require('razorpay');
 
 
 const dotenv = require('dotenv');
+const helmet = require('helmet');
+const morgan = require('morgan');
 
 dotenv.config();
 
@@ -24,6 +28,14 @@ const sequelize = require('./util/database');
 const bcrypt = require('bcrypt');
 
 const app = express();
+
+// const accessLogStream = fs.createWriteStream(
+//     path.join(__dirname, 'access.log'),
+//     { flags: 'a' });
+
+app.use(helmet());
+
+// app.use(morgan('combined', {stream: accessLogStream}));
 
 app.use(cors());
 
@@ -38,6 +50,7 @@ app.use('/purchase', purchaseRoutes);
 app.use('/premium', premiumFeatureRoutes);
 
 app.use('/password', resetPasswordRoutes);
+
 
 // app.delete('/user/delete-expense/:id', async (req, res, next) => { 
 //     const uId = req.params. id;
