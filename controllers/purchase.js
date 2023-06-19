@@ -11,22 +11,22 @@ exports.purchasepremium =async (req, res) => {
             key_secret: process.env.key_secret
         })
         const amount = 2500;
-
-        console.log("Razorpay",rzp);
-        console.log("\n\n\nHere");
-        rzp.orders.create({amount, currency: "INR"}, (err, order) => {
+        rzp.orders.create({amount, currency: "INR"}, async(err, order) => {
             console.log("Order in creation is", order);
             if(err) {
                 console.log(err);
                 throw new Error("Error in creation",JSON.stringify(err));
             }
-            req.user.createOrder({ orderid: order.id, status: 'PENDING'}).then(() => {
-                console.log("After creating order", order);
-                return res.status(201).json({ order, key_id : rzp.key_id});
+            const userId = req.user.id;
 
-            }).catch(err => {
-                throw new Error(err);
+            const userOrder = new Order({
+                orderid: order.id,
+                status: 'PENDING',
+                userId: userId
             })
+            await userOrder.save();
+
+            return res.status(201).json({ order, key_id: rzp.key_id });
         })
     } catch(err){
         console.log("Error in purchase");
@@ -37,27 +37,23 @@ exports.purchasepremium =async (req, res) => {
 
 exports.updateTransactionStatus = async (req, res ) => {
     try {
-        const { payment_id, order_id} = req.body;
-        Order.findOne({where : {orderid : order_id}}).then(order => {
-            order.update({ paymentid: payment_id, status: 'SUCCESSFUL'}).then(() => {
-                console.log("\nupdate transaction\n", req.user.id);
-                console.log("\nupdate transaction\n", req.user.ispremiumuser);
-
-                req.user.update({ispremiumuser: true})
-
-                console.log("\nafter update transaction\n", req.user.ispremiumuser);
-
-
-                return res.status(202).json({sucess: true, message: "Transaction Successful", token:userController.generateAccessToken(req.user.id,undefined,req.user.ispremiumuser)});
-            }).catch((err)=> {
-                throw new Error(err);
-            })
-        }).catch(err => {
-            throw new Error(err);
-        })
-    } catch (err) {
+        const { payment_id, order_id } = req.body;
+    
+        const order = await Order.findOne({ orderid: order_id });
+        order.paymentid = payment_id;
+        order.status = 'SUCCESSFUL';
+        await order.save();
+    
+        req.user.ispremiumuser = true;
+        await req.user.save();
+    
+        return res.status(202).json({
+          success: true,
+          message: 'Transaction Successful',
+          token: userController.generateAccessToken(req.user.id, undefined, req.user.ispremiumuser)
+        });
+      } catch (err) {
         console.log(err);
-        res.status(403).json({ errpr: err, message: 'Sometghing went wrong' })
-
-    }
+        res.status(403).json({ error: err, message: 'Something went wrong' });
+      }
 }

@@ -1,4 +1,5 @@
 const express = require('express');
+
 const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
@@ -6,14 +7,14 @@ const bodyParser = require('body-parser');
 const Expense = require('./models/expense');
 const User = require('./models/user');
 const Forgotpassword = require('./models/forgotpassword');
+const Order = require('./models/order');
+const Razorpay = require('razorpay');
 
 const userRoutes = require('./routes/user');
 const expenseRoutes = require('./routes/expense');
 const purchaseRoutes = require('./routes/purchase');
 const premiumFeatureRoutes = require('./routes/premiumFeature')
 const resetPasswordRoutes = require('./routes/resetpassword')
-const Order = require('./models/order');
-const Razorpay = require('razorpay');
 
 
 const dotenv = require('dotenv');
@@ -22,8 +23,7 @@ const morgan = require('morgan');
 
 dotenv.config();
 
-
-const sequelize = require('./util/database');
+const mongoose = require('mongoose');
 
 const bcrypt = require('bcrypt');
 
@@ -58,17 +58,11 @@ app.use('/password', resetPasswordRoutes);
 //     res.sendStatus (200);
 // })
 
-Expense.belongsTo(User);
-User.hasMany(Expense);
 
-User.hasMany(Order);
-Order.belongsTo(User);
-
-User.hasMany(Forgotpassword);
-Forgotpassword.belongsTo(User);
-
-sequelize.sync()
-.then( () => {
-    app.listen(1000);
+mongoose.connect('mongodb+srv://piyushv:fr5Cp8tHaAJ06R4N@cluster0.l7fuzif.mongodb.net/expense-tracker?retryWrites=true&w=majority')
+.then(result => {
+  app.listen(1000);
 })
-.catch( err => console.log(err));
+.catch(err => {
+  console.log(err);
+})

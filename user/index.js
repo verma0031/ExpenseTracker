@@ -58,7 +58,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     axios.get('http://localhost:1000/user/getExpense', {headers: {"Authorization": token}})
             .then( (response) => {
-                console.log(response);
+                console.log("response after getting expenses",response);
 
                 for (var i = 0; i<response.data.expenses.length; i++){
                     showExpense(response.data.expenses[i]);
@@ -85,8 +85,8 @@ function onPressingAddExpense(){
 
             axios.post ("http://localhost:1000/user/addExpense", obj, {headers: {"Authorization": token}})
             .then( (response) => {
-                console. log (response);
-                showExpense(response.data.newUserDetail);
+                console. log ("response after adding expense",response.data);
+                showExpense(response.data);
                 // showInTable(response.data.newUserDetail);
             })
             .catch((err) => {
@@ -97,6 +97,7 @@ function onPressingAddExpense(){
 }
 
 function showExpense(ex){
+
     document. getElementById('expense').value='';
     document.getElementById("description").value='';
     document. getElementById('category'). value='';
@@ -106,7 +107,7 @@ function showExpense(ex){
     // const childHTML = `<li id = ${ex.id}> ${ex.expense} -> ${ex.description} + ${ex.category} <button onclick=deleteUser('${ex.id}')>DELETE</button> </li>`;
 
     const childNode = document.createElement('li');
-    childNode.id = `${ex.id}`;
+    childNode.id = `${ex._id}`;
     childNode.textContent = `${ex.expense} ${ex.description} ${ex.category} `;
 
 

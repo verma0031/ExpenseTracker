@@ -13,6 +13,6 @@ router.post('/signup', userController.signup);
 
 router.post('/login', userController.login)
 
-router.get('/download', userAuthentication.authenticate, expenseController.downloadexpense)
+// router.get('/download', userAuthentication.authenticate, expenseController.downloadexpense)
 
 module.exports = router;
